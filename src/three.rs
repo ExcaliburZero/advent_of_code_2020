@@ -130,7 +130,7 @@ fn read_input() -> Grid {
 
 fn count_trees_on_path(
     grid: &Grid,
-    position_change: &PositionChange,
+    slope: &PositionChange,
     position: &Position,
     trees_hit: i32,
 ) -> i32 {
@@ -141,8 +141,8 @@ fn count_trees_on_path(
 
         return count_trees_on_path(
             grid,
-            position_change,
-            &position.shifted(position_change),
+            slope,
+            &position.shifted(slope),
             trees_hit + trees_hit_inc,
         );
     }
@@ -154,8 +154,8 @@ fn count_and_multiply_trees_on_paths(
     starting_position: &Position,
 ) -> i64 {
     let mut nums_of_trees_hit: Vec<i64> = vec![];
-    for slop in slopes.iter() {
-        let trees_hit = count_trees_on_path(grid, slop, starting_position, 0);
+    for slope in slopes.iter() {
+        let trees_hit = count_trees_on_path(grid, slope, starting_position, 0);
 
         nums_of_trees_hit.push(trees_hit as i64);
     }
