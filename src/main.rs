@@ -4,7 +4,6 @@ use clap::{Arg, App, SubCommand};
 extern crate advent_of_code_2020;
 
 fn main() {
-    /*
     let matches =
         App::new("advent_of_code_2020")
             .author("Christopher Wells <cwellsny@gmail.com>")
@@ -27,5 +26,4 @@ fn main() {
             p => { println!("Unknown part: {}", p); }
         }
     }
-    */
 }
