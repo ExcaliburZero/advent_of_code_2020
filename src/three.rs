@@ -3,12 +3,50 @@ use std::io::prelude::*;
 
 pub fn part_one() {
     let grid = read_input();
-    let answer = count_trees_right_3_down_1(&grid, Position { x: 0, y: 0 }, 0);
+    let answer = count_trees_on_path(
+        &grid,
+        &PositionChange {
+            x_shift: 3,
+            y_shift: 1,
+        },
+        &Position { x: 0, y: 0 },
+        0,
+    );
 
     println!("{}", answer);
 }
 
-pub fn part_two() {}
+pub fn part_two() {
+    let grid = read_input();
+    let answer = count_and_multiply_trees_on_paths(
+        &grid,
+        &vec![
+            PositionChange {
+                x_shift: 1,
+                y_shift: 1,
+            },
+            PositionChange {
+                x_shift: 3,
+                y_shift: 1,
+            },
+            PositionChange {
+                x_shift: 5,
+                y_shift: 1,
+            },
+            PositionChange {
+                x_shift: 7,
+                y_shift: 1,
+            },
+            PositionChange {
+                x_shift: 1,
+                y_shift: 2,
+            },
+        ],
+        &Position { x: 0, y: 0 },
+    );
+
+    println!("{}", answer);
+}
 
 struct Position {
     x: usize,
@@ -16,12 +54,20 @@ struct Position {
 }
 
 impl Position {
-    pub fn shifted(&self, x_shift: i32, y_shift: i32) -> Position {
+    pub fn shifted(&self, change: &PositionChange) -> Position {
+        let x_shift = change.x_shift;
+        let y_shift = change.y_shift;
+
         Position {
             x: ((self.x as i32) + x_shift) as usize,
             y: ((self.y as i32) + y_shift) as usize,
         }
     }
+}
+
+struct PositionChange {
+    x_shift: i32,
+    y_shift: i32,
 }
 
 struct Grid {
@@ -53,8 +99,6 @@ impl Grid {
     }
 
     pub fn get(&self, position: &Position) -> bool {
-        assert!(position.x >= 0);
-        assert!(position.y >= 0);
         assert!(position.y < self.height());
 
         let x_adjusted = position.x % self.width();
@@ -84,12 +128,37 @@ fn read_input() -> Grid {
     Grid::from_str(&grid_string)
 }
 
-fn count_trees_right_3_down_1(grid: &Grid, position: Position, trees_hit: i32) -> i32 {
+fn count_trees_on_path(
+    grid: &Grid,
+    position_change: &PositionChange,
+    position: &Position,
+    trees_hit: i32,
+) -> i32 {
     if position.y >= grid.height() {
         return trees_hit;
     } else {
         let trees_hit_inc = if grid.get(&position) { 1 } else { 0 };
 
-        return count_trees_right_3_down_1(grid, position.shifted(3, 1), trees_hit + trees_hit_inc);
+        return count_trees_on_path(
+            grid,
+            position_change,
+            &position.shifted(position_change),
+            trees_hit + trees_hit_inc,
+        );
     }
+}
+
+fn count_and_multiply_trees_on_paths(
+    grid: &Grid,
+    slopes: &Vec<PositionChange>,
+    starting_position: &Position,
+) -> i64 {
+    let mut nums_of_trees_hit: Vec<i64> = vec![];
+    for slop in slopes.iter() {
+        let trees_hit = count_trees_on_path(grid, slop, starting_position, 0);
+
+        nums_of_trees_hit.push(trees_hit as i64);
+    }
+
+    nums_of_trees_hit.iter().fold(1, |a, b| a * b)
 }
