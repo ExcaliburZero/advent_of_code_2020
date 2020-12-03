@@ -22,6 +22,14 @@ fn main() {
                     .index(1),
             ),
         )
+        .subcommand(
+            SubCommand::with_name("day3").arg(
+                Arg::with_name("part")
+                    .help("Selects the part to run (one, two)")
+                    .required(true)
+                    .index(1),
+            ),
+        )
         .get_matches();
 
     if let Some(matches) = matches.subcommand_matches("day1") {
@@ -47,6 +55,20 @@ fn main() {
             }
             "two" => {
                 advent_of_code_2020::two::part_two();
+            }
+            p => {
+                println!("Unknown part: {}", p);
+            }
+        }
+    } else if let Some(matches) = matches.subcommand_matches("day3") {
+        let part = matches.value_of("part").unwrap();
+
+        match part {
+            "one" => {
+                advent_of_code_2020::three::part_one();
+            }
+            "two" => {
+                advent_of_code_2020::three::part_two();
             }
             p => {
                 println!("Unknown part: {}", p);
