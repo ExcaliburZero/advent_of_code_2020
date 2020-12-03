@@ -4,12 +4,16 @@ use std::io::prelude::*;
 
 pub fn part_one() {
     let cases = read_input();
-    let answer = count_invalid_passwords(&cases);
+    let answer = count_invalid_passwords_count(&cases);
 
     println!("{}", answer);
 }
 
 pub fn part_two() {
+    let cases = read_input();
+    let answer = count_invalid_passwords_positions(&cases);
+
+    println!("{}", answer);
 }
 
 pub struct PasswordRule {
@@ -38,12 +42,19 @@ impl PasswordRule {
         (rule, password.to_string())
     }
 
-    pub fn validate(&self, password: &str) -> bool {
+    pub fn validate_count(&self, password: &str) -> bool {
         let letter_count = password.chars()
             .filter(|l| *l == self.letter)
             .count() as i32;
 
         self.min <= letter_count && letter_count <= self.max
+    }
+
+    pub fn validate_positions(&self, password: &str) -> bool {
+        let first_matches = password.chars().nth((self.min - 1) as usize).unwrap() == self.letter;
+        let second_matches = password.chars().nth((self.max - 1) as usize).unwrap() == self.letter;
+
+        first_matches ^ second_matches
     }
 }
 
@@ -61,11 +72,20 @@ fn read_input() -> Vec<(PasswordRule, String)> {
     rules_and_passwords
 }
 
-fn count_invalid_passwords(rules_and_passwords: &Vec<(PasswordRule, String)>) -> i32 {
+fn count_invalid_passwords_count(rules_and_passwords: &Vec<(PasswordRule, String)>) -> i32 {
     rules_and_passwords.iter()
         .filter(|rule_and_password| {
             let (rule, password) = rule_and_password;
 
-            rule.validate(password)
+            rule.validate_count(password)
+        }).count() as i32
+}
+
+fn count_invalid_passwords_positions(rules_and_passwords: &Vec<(PasswordRule, String)>) -> i32 {
+    rules_and_passwords.iter()
+        .filter(|rule_and_password| {
+            let (rule, password) = rule_and_password;
+
+            rule.validate_positions(password)
         }).count() as i32
 }
