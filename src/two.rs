@@ -1,4 +1,3 @@
-
 use std::io;
 use std::io::prelude::*;
 
@@ -35,17 +34,13 @@ impl PasswordRule {
         let min: i32 = min_max[0].parse().unwrap();
         let max: i32 = min_max[1].parse().unwrap();
 
-        let rule = PasswordRule {
-            min, max, letter
-        };
+        let rule = PasswordRule { min, max, letter };
 
         (rule, password.to_string())
     }
 
     pub fn validate_count(&self, password: &str) -> bool {
-        let letter_count = password.chars()
-            .filter(|l| *l == self.letter)
-            .count() as i32;
+        let letter_count = password.chars().filter(|l| *l == self.letter).count() as i32;
 
         self.min <= letter_count && letter_count <= self.max
     }
@@ -73,19 +68,23 @@ fn read_input() -> Vec<(PasswordRule, String)> {
 }
 
 fn count_invalid_passwords_count(rules_and_passwords: &Vec<(PasswordRule, String)>) -> i32 {
-    rules_and_passwords.iter()
+    rules_and_passwords
+        .iter()
         .filter(|rule_and_password| {
             let (rule, password) = rule_and_password;
 
             rule.validate_count(password)
-        }).count() as i32
+        })
+        .count() as i32
 }
 
 fn count_invalid_passwords_positions(rules_and_passwords: &Vec<(PasswordRule, String)>) -> i32 {
-    rules_and_passwords.iter()
+    rules_and_passwords
+        .iter()
         .filter(|rule_and_password| {
             let (rule, password) = rule_and_password;
 
             rule.validate_positions(password)
-        }).count() as i32
+        })
+        .count() as i32
 }
