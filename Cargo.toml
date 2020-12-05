@@ -6,3 +6,4 @@ authors = ["Christopher Wells <cwellsny@gmail.com>"]
 [dependencies]
 clap = "~2"
 clippy = ""
+regex = "1"
