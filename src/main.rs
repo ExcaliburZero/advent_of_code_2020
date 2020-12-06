@@ -56,5 +56,10 @@ fn get_days() -> Vec<(i32, fn(), fn())> {
             advent_of_code_2020::four::part_one as fn(),
             advent_of_code_2020::four::part_two as fn(),
         ),
+        (
+            5,
+            advent_of_code_2020::five::part_one as fn(),
+            advent_of_code_2020::five::part_two as fn(),
+        ),
     ]
 }
