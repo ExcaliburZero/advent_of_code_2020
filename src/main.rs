@@ -4,97 +4,57 @@ use clap::{App, Arg, SubCommand};
 extern crate advent_of_code_2020;
 
 fn main() {
-    let matches = App::new("advent_of_code_2020")
-        .author("Christopher Wells <cwellsny@gmail.com>")
-        .subcommand(
-            SubCommand::with_name("day1").arg(
+    let a = App::new("advent_of_code_2020").author("Christopher Wells <cwellsny@gmail.com>");
+
+    let days = get_days();
+    let app = days.iter().map(|d| d.0).fold(a, |b, day| {
+        b.subcommand(
+            SubCommand::with_name(&format!("day{}", day)).arg(
                 Arg::with_name("part")
                     .help("Selects the part to run (one, two)")
                     .required(true)
                     .index(1),
             ),
         )
-        .subcommand(
-            SubCommand::with_name("day2").arg(
-                Arg::with_name("part")
-                    .help("Selects the part to run (one, two)")
-                    .required(true)
-                    .index(1),
-            ),
-        )
-        .subcommand(
-            SubCommand::with_name("day3").arg(
-                Arg::with_name("part")
-                    .help("Selects the part to run (one, two)")
-                    .required(true)
-                    .index(1),
-            ),
-        )
-        .subcommand(
-            SubCommand::with_name("day4").arg(
-                Arg::with_name("part")
-                    .help("Selects the part to run (one, two)")
-                    .required(true)
-                    .index(1),
-            ),
-        )
-        .get_matches();
+    });
+    let matches = app.get_matches();
 
-    if let Some(matches) = matches.subcommand_matches("day1") {
-        let part = matches.value_of("part").unwrap();
+    for (day, part_one, part_two) in days {
+        let day_string = format!("day{}", day);
 
-        match part {
-            "one" => {
-                advent_of_code_2020::one::part_one();
-            }
-            "two" => {
-                advent_of_code_2020::one::part_two();
-            }
-            p => {
-                println!("Unknown part: {}", p);
-            }
-        }
-    } else if let Some(matches) = matches.subcommand_matches("day2") {
-        let part = matches.value_of("part").unwrap();
+        if let Some(matches) = matches.subcommand_matches(day_string) {
+            let part = matches.value_of("part").unwrap();
 
-        match part {
-            "one" => {
-                advent_of_code_2020::two::part_one();
-            }
-            "two" => {
-                advent_of_code_2020::two::part_two();
-            }
-            p => {
-                println!("Unknown part: {}", p);
-            }
-        }
-    } else if let Some(matches) = matches.subcommand_matches("day3") {
-        let part = matches.value_of("part").unwrap();
-
-        match part {
-            "one" => {
-                advent_of_code_2020::three::part_one();
-            }
-            "two" => {
-                advent_of_code_2020::three::part_two();
-            }
-            p => {
-                println!("Unknown part: {}", p);
-            }
-        }
-    } else if let Some(matches) = matches.subcommand_matches("day4") {
-        let part = matches.value_of("part").unwrap();
-
-        match part {
-            "one" => {
-                advent_of_code_2020::four::part_one();
-            }
-            "two" => {
-                advent_of_code_2020::four::part_two();
-            }
-            p => {
-                println!("Unknown part: {}", p);
+            match part {
+                "one" => part_one(),
+                "two" => part_two(),
+                p => println!("Unknown part: {}", p),
             }
         }
     }
+}
+
+fn get_days() -> Vec<(i32, fn(), fn())> {
+    vec![
+        (
+            1,
+            advent_of_code_2020::one::part_one as fn(),
+            advent_of_code_2020::one::part_two as fn(),
+        ),
+        (
+            2,
+            advent_of_code_2020::two::part_one as fn(),
+            advent_of_code_2020::two::part_two as fn(),
+        ),
+        (
+            3,
+            advent_of_code_2020::three::part_one as fn(),
+            advent_of_code_2020::three::part_two as fn(),
+        ),
+        (
+            4,
+            advent_of_code_2020::four::part_one as fn(),
+            advent_of_code_2020::four::part_two as fn(),
+        ),
+    ]
 }
