@@ -1,3 +1,4 @@
+use std::collections::BTreeSet;
 use std::io::{self, BufRead};
 
 pub fn part_one() {
@@ -7,7 +8,12 @@ pub fn part_one() {
     println!("{}", answer);
 }
 
-pub fn part_two() {}
+pub fn part_two() {
+    let seat_locations = read_input(io::stdin().lock());
+    let answer = get_open_seat_id(&seat_locations);
+
+    println!("{}", answer);
+}
 
 enum VerticalDirection {
     Up,
@@ -94,6 +100,34 @@ fn get_highest_seat_id(seat_locations: &Vec<SeatLocation>) -> u32 {
         .map(|l| l.to_position().to_id())
         .max()
         .unwrap()
+}
+
+fn get_open_seat_id(seat_locations: &Vec<SeatLocation>) -> u32 {
+    let filled_seats: BTreeSet<u32> = seat_locations
+        .iter()
+        .map(|l| l.to_position().to_id())
+        .collect();
+
+    let second_seat = Position { row: 0, column: 1 };
+    let penultimate_seat = Position {
+        row: 127,
+        column: 62,
+    };
+
+    for id in second_seat.to_id()..penultimate_seat.to_id() {
+        assert!(id != 0);
+
+        let prev = id - 1;
+        let next = id + 1;
+
+        if !filled_seats.contains(&id)
+            && filled_seats.contains(&prev)
+            && filled_seats.contains(&next)
+        {
+            return id;
+        }
+    }
+    panic!()
 }
 
 #[cfg(test)]
