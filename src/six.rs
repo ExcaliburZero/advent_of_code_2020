@@ -8,7 +8,12 @@ pub fn part_one() {
     println!("{}", answer)
 }
 
-pub fn part_two() {}
+pub fn part_two() {
+    let groups = read_input(io::stdin().lock());
+    let answer = sum_num_questions_all_anwered_yes(&groups);
+
+    println!("{}", answer)
+}
 
 struct GroupAnswers {
     member_answers: Vec<BTreeSet<char>>,
@@ -40,6 +45,17 @@ impl GroupAnswers {
             })
             .len() as i32
     }
+
+    fn num_questions_all_anwered_yes(&self) -> i32 {
+        if self.member_answers.len() == 0 {
+            0
+        } else {
+            self.member_answers[0]
+                .iter()
+                .filter(|a| self.member_answers.iter().all(|ma| ma.contains(a)))
+                .count() as i32
+        }
+    }
 }
 
 fn read_input<R>(reader: R) -> Vec<GroupAnswers>
@@ -65,5 +81,12 @@ fn sum_num_questions_any_anwered_yes(groups: &Vec<GroupAnswers>) -> i32 {
     groups
         .iter()
         .map(GroupAnswers::num_questions_any_anwered_yes)
+        .sum()
+}
+
+fn sum_num_questions_all_anwered_yes(groups: &Vec<GroupAnswers>) -> i32 {
+    groups
+        .iter()
+        .map(GroupAnswers::num_questions_all_anwered_yes)
         .sum()
 }
