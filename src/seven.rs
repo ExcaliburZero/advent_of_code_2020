@@ -10,7 +10,12 @@ pub fn part_one() {
     println!("{}", answer);
 }
 
-pub fn part_two() {}
+pub fn part_two() {
+    let rules = read_input(io::stdin().lock());
+    let answer = num_bags_within(&rules, "shiny gold");
+
+    println!("{}", answer);
+}
 
 struct BagRules {
     rules: BTreeMap<String, Vec<(String, u32)>>,
@@ -127,4 +132,14 @@ fn path_to(rules: &BagRules, starting_bag: &str, target_bag: &str) -> Option<Vec
     }
 
     panic!()
+}
+
+fn num_bags_within(rules: &BagRules, starting_bag: &str) -> u32 {
+    rules
+        .rules
+        .get(starting_bag)
+        .unwrap()
+        .iter()
+        .map(|(b, num)| (num_bags_within(rules, b) + 1) * num)
+        .sum()
 }
