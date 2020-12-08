@@ -38,6 +38,8 @@ jobs:
       - id: coverage
         name: Coverage
         uses: actions-rs/grcov@v0.1
+        with:
+          config: configs/grcov.yml
 
       - name: Coveralls upload
         uses: coverallsapp/github-action@master
