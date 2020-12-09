@@ -1,6 +1,7 @@
 #![feature(map_first_last)]
 
 pub mod eight;
+pub mod eight_b;
 pub mod five;
 pub mod four;
 pub mod one;
