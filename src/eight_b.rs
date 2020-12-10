@@ -140,7 +140,7 @@ impl ControlFlowGraph<'_> {
         }
     }
 
-    fn print(&self) {
+    /*fn print(&self) {
         for (source, destinations) in self.edges.iter() {
             println!("{}", source);
 
@@ -148,7 +148,7 @@ impl ControlFlowGraph<'_> {
                 println!("    {}  {}", weight, destination_index);
             }
         }
-    }
+    }*/
 
     fn depth_first_search(
         &self,

@@ -70,7 +70,7 @@ impl BagRules {
         BagRules { rules }
     }
 
-    fn print(&self) {
+    /*fn print(&self) {
         for (k, v) in self.rules.iter() {
             println!(
                 "{} -> {}",
@@ -79,7 +79,7 @@ impl BagRules {
                     .fold("".to_string(), |a, b| format!("{}   {} {}", a, b.1, b.0))
             );
         }
-    }
+    }*/
 }
 
 fn read_input<R>(reader: R) -> BagRules
