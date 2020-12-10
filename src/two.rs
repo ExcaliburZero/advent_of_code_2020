@@ -67,7 +67,7 @@ fn read_input() -> Vec<(PasswordRule, String)> {
     rules_and_passwords
 }
 
-fn count_invalid_passwords_count(rules_and_passwords: &Vec<(PasswordRule, String)>) -> i32 {
+fn count_invalid_passwords_count(rules_and_passwords: &[(PasswordRule, String)]) -> i32 {
     rules_and_passwords
         .iter()
         .filter(|rule_and_password| {
@@ -78,7 +78,7 @@ fn count_invalid_passwords_count(rules_and_passwords: &Vec<(PasswordRule, String
         .count() as i32
 }
 
-fn count_invalid_passwords_positions(rules_and_passwords: &Vec<(PasswordRule, String)>) -> i32 {
+fn count_invalid_passwords_positions(rules_and_passwords: &[(PasswordRule, String)]) -> i32 {
     rules_and_passwords
         .iter()
         .filter(|rule_and_password| {
