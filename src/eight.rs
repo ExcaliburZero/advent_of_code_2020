@@ -41,7 +41,7 @@ struct Program {
 }
 
 impl Program {
-    fn from_lines(lines: &Vec<String>) -> Program {
+    fn from_lines(lines: &[String]) -> Program {
         Program {
             instructions: lines.iter().map(|l| Instruction::from_str(l)).collect(),
         }
@@ -98,7 +98,7 @@ enum Instruction {
 
 impl Instruction {
     fn from_str(instruction_str: &str) -> Instruction {
-        let parts: Vec<&str> = instruction_str.split(" ").collect();
+        let parts: Vec<&str> = instruction_str.split(' ').collect();
 
         assert!(parts.len() == 2);
 
@@ -115,7 +115,8 @@ fn read_input<R>(reader: R) -> Program
 where
     R: BufRead,
 {
-    Program::from_lines(&reader.lines().map(|l| l.unwrap().to_string()).collect())
+    let lines: Vec<String> = reader.lines().map(|l| l.unwrap()).collect();
+    Program::from_lines(&lines)
 }
 
 fn get_terminating_accumulator_value_after_fix(program: &Program) -> Option<i32> {
