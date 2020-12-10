@@ -1,3 +1,4 @@
+use std::collections::btree_map;
 use std::collections::{BTreeMap, BTreeSet};
 use std::io::{self, BufRead};
 
@@ -75,8 +76,8 @@ fn calc_num_valid_paths(
 ) -> u64 {
     if source == destination {
         1
-    } else if cache.contains_key(&source) {
-        *cache.get(&source).unwrap()
+    } else if let btree_map::Entry::Occupied(entry) = cache.entry(source) {
+        *entry.get()
     } else {
         match get_next_nodes(nodes, source) {
             None => 0,
