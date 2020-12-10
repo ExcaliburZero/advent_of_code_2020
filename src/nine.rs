@@ -24,7 +24,7 @@ where
         .collect()
 }
 
-fn get_first_non_prev_sum_number(numbers: &Vec<i64>) -> Option<i64> {
+fn get_first_non_prev_sum_number(numbers: &[i64]) -> Option<i64> {
     assert!(numbers.len() >= 25);
 
     for i in 25..numbers.len() {
@@ -52,7 +52,7 @@ fn get_first_non_prev_sum_number(numbers: &Vec<i64>) -> Option<i64> {
     None
 }
 
-fn sum_min_max_contiguous_bad_num_summing_range(numbers: &Vec<i64>) -> Option<i64> {
+fn sum_min_max_contiguous_bad_num_summing_range(numbers: &[i64]) -> Option<i64> {
     match get_first_non_prev_sum_number(numbers) {
         None => None,
         Some(bad_number) => {
