@@ -22,7 +22,7 @@ struct BagRules {
 }
 
 impl BagRules {
-    fn from_lines(lines: &Vec<String>) -> BagRules {
+    fn from_lines(lines: &[String]) -> BagRules {
         let rule_regex = self::regex::Regex::new(
             r"^([a-z,\s]+) bags contain (((\d* ([a-z,\s])+ bags?,?\s?)|(no other bags))+).$",
         )
@@ -86,7 +86,8 @@ fn read_input<R>(reader: R) -> BagRules
 where
     R: BufRead,
 {
-    BagRules::from_lines(&reader.lines().map(|l| l.unwrap().to_string()).collect())
+    let lines: Vec<String> = reader.lines().map(|l| l.unwrap()).collect();
+    BagRules::from_lines(&lines)
 }
 
 fn num_bags_can_contain(rules: &BagRules, desired_bag: &str) -> u32 {
