@@ -67,7 +67,7 @@ impl SeatLocation {
         let mut row = 0;
         for direction in self.vertical_directions.iter() {
             match direction {
-                VerticalDirection::Up => row = row << 1,
+                VerticalDirection::Up => row <<= 1,
                 VerticalDirection::Down => row = (row << 1) + 1,
             }
         }
@@ -75,7 +75,7 @@ impl SeatLocation {
         let mut column = 0;
         for direction in self.horizontal_directions.iter() {
             match direction {
-                HorizontalDirection::Left => column = column << 1,
+                HorizontalDirection::Left => column <<= 1,
                 HorizontalDirection::Right => column = (column << 1) + 1,
             }
         }
@@ -94,7 +94,7 @@ where
         .collect()
 }
 
-fn get_highest_seat_id(seat_locations: &Vec<SeatLocation>) -> u32 {
+fn get_highest_seat_id(seat_locations: &[SeatLocation]) -> u32 {
     seat_locations
         .iter()
         .map(|l| l.to_position().to_id())
@@ -102,7 +102,7 @@ fn get_highest_seat_id(seat_locations: &Vec<SeatLocation>) -> u32 {
         .unwrap()
 }
 
-fn get_open_seat_id(seat_locations: &Vec<SeatLocation>) -> u32 {
+fn get_open_seat_id(seat_locations: &[SeatLocation]) -> u32 {
     let filled_seats: BTreeSet<u32> = seat_locations
         .iter()
         .map(|l| l.to_position().to_id())
