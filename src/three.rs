@@ -20,7 +20,7 @@ pub fn part_two() {
     let grid = read_input();
     let answer = count_and_multiply_trees_on_paths(
         &grid,
-        &vec![
+        &[
             PositionChange {
                 x_shift: 1,
                 y_shift: 1,
@@ -80,7 +80,7 @@ struct Grid {
 impl Grid {
     pub fn from_str(grid_str: &str) -> Grid {
         let mut cells: Vec<Vec<bool>> = vec![];
-        for line in grid_str.split("\n") {
+        for line in grid_str.split('\n') {
             let mut row: Vec<bool> = vec![];
             for c in line.chars() {
                 let value = match c {
@@ -111,7 +111,7 @@ impl Grid {
     }
 
     pub fn width(&self) -> usize {
-        assert!(self.cells.len() > 0);
+        assert!(!self.cells.is_empty());
 
         self.cells[0].len()
     }
@@ -135,22 +135,22 @@ fn count_trees_on_path(
     trees_hit: i32,
 ) -> i32 {
     if position.y >= grid.height() {
-        return trees_hit;
+        trees_hit
     } else {
         let trees_hit_inc = if grid.get(&position) { 1 } else { 0 };
 
-        return count_trees_on_path(
+        count_trees_on_path(
             grid,
             slope,
             &position.shifted(slope),
             trees_hit + trees_hit_inc,
-        );
+        )
     }
 }
 
 fn count_and_multiply_trees_on_paths(
     grid: &Grid,
-    slopes: &Vec<PositionChange>,
+    slopes: &[PositionChange],
     starting_position: &Position,
 ) -> i64 {
     let mut nums_of_trees_hit: Vec<i64> = vec![];
@@ -160,5 +160,5 @@ fn count_and_multiply_trees_on_paths(
         nums_of_trees_hit.push(trees_hit as i64);
     }
 
-    nums_of_trees_hit.iter().fold(1, |a, b| a * b)
+    nums_of_trees_hit.iter().product()
 }
