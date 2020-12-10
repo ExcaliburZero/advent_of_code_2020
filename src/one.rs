@@ -29,7 +29,7 @@ fn read_input() -> Vec<i32> {
 }
 
 fn multiply_2020_addends(numbers: &mut Vec<i32>) -> i32 {
-    numbers.sort();
+    numbers.sort_unstable();
 
     for num in numbers.iter() {
         let target = 2020 - *num;
@@ -42,7 +42,7 @@ fn multiply_2020_addends(numbers: &mut Vec<i32>) -> i32 {
     panic!("No valid answer.");
 }
 
-fn multiply_2020_three_addends(numbers: &Vec<i32>) -> i32 {
+fn multiply_2020_three_addends(numbers: &[i32]) -> i32 {
     let size = numbers.len();
 
     for i in 0..size {
