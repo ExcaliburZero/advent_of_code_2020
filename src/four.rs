@@ -28,7 +28,7 @@ struct Passport {
 }
 
 impl Passport {
-    pub fn from_lines(lines: &Vec<String>) -> Passport {
+    pub fn from_lines(lines: &[String]) -> Passport {
         let mut birth_year: Option<String> = None;
         let mut issue_year: Option<String> = None;
         let mut expiration_year: Option<String> = None;
@@ -40,12 +40,12 @@ impl Passport {
 
         let parts: Vec<String> = lines
             .iter()
-            .flat_map(|l| l.split(" "))
+            .flat_map(|l| l.split(' '))
             .map(|s| s.to_string())
             .collect();
 
         for part in parts.iter() {
-            let key_value: Vec<&str> = part.split(":").collect();
+            let key_value: Vec<&str> = part.split(':').collect();
             assert!(key_value.len() == 2);
 
             let key = key_value[0];
@@ -107,7 +107,7 @@ impl Passport {
 
         let year = self.birth_year.as_ref().unwrap().parse::<i32>().unwrap();
 
-        year >= 1920 && year <= 2002
+        (1920..=2002).contains(&year)
     }
 
     pub fn issue_year_is_valid(&self) -> bool {
@@ -117,7 +117,7 @@ impl Passport {
 
         let year = self.issue_year.as_ref().unwrap().parse::<i32>().unwrap();
 
-        year >= 2010 && year <= 2020
+        (2010..=2020).contains(&year)
     }
 
     pub fn expiration_year_is_valid(&self) -> bool {
@@ -132,7 +132,7 @@ impl Passport {
             .parse::<i32>()
             .unwrap();
 
-        year >= 2020 && year <= 2030
+        (2020..=2030).contains(&year)
     }
 
     pub fn height_is_valid(&self) -> bool {
@@ -149,9 +149,9 @@ impl Passport {
                 assert!(unit == "cm" || unit == "in");
 
                 if unit == "cm" {
-                    150 <= value && value <= 193
+                    (150..=193).contains(&value)
                 } else {
-                    59 <= value && value <= 76
+                    (59..=76).contains(&value)
                 }
             }
         }
@@ -189,20 +189,20 @@ where
         .collect::<Vec<String>>()
         .join("\n")
         .split("\n\n")
-        .map(|lines| lines.split("\n").map(|l| l.to_string()).collect())
+        .map(|lines| lines.split('\n').map(|l| l.to_string()).collect())
         .collect();
 
     password_strings
         .iter()
-        .map(Passport::from_lines)
+        .map(|lines| Passport::from_lines(lines))
         .collect::<Vec<Passport>>()
 }
 
-fn count_passports_with_required_fields(passports: &Vec<Passport>) -> i32 {
+fn count_passports_with_required_fields(passports: &[Passport]) -> i32 {
     passports.iter().filter(|p| p.has_required_fields()).count() as i32
 }
 
-fn count_valid_passports(passports: &Vec<Passport>) -> i32 {
+fn count_valid_passports(passports: &[Passport]) -> i32 {
     passports.iter().filter(|p| p.is_valid()).count() as i32
 }
 
