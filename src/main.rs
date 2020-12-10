@@ -34,7 +34,9 @@ fn main() {
     }
 }
 
-fn get_days() -> Vec<(String, fn(), fn())> {
+type AdventOfCodeDay = (String, fn(), fn());
+
+fn get_days() -> Vec<AdventOfCodeDay> {
     vec![
         (
             "1".to_string(),
