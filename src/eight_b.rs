@@ -44,7 +44,7 @@ struct Program {
 }
 
 impl Program {
-    fn from_lines(lines: &Vec<String>) -> Program {
+    fn from_lines(lines: &[String]) -> Program {
         Program {
             instructions: lines.iter().map(|l| Instruction::from_str(l)).collect(),
         }
@@ -167,7 +167,7 @@ impl ControlFlowGraph<'_> {
                 .filter(|(_, i)| !ControlFlowGraph::path_contains_node(path, *i))
                 .collect();
 
-            if next_nodes.len() == 0 {
+            if next_nodes.is_empty() {
                 // No next nodes left to try
                 None
             } else {
@@ -203,7 +203,7 @@ impl ControlFlowGraph<'_> {
         }
     }
 
-    fn path_contains_node(path: &Vec<(u32, usize)>, index: usize) -> bool {
+    fn path_contains_node(path: &[(u32, usize)], index: usize) -> bool {
         path.iter()
             .filter(|(_, i)| *i == index)
             .peekable()
@@ -242,7 +242,7 @@ enum Instruction {
 
 impl Instruction {
     fn from_str(instruction_str: &str) -> Instruction {
-        let parts: Vec<&str> = instruction_str.split(" ").collect();
+        let parts: Vec<&str> = instruction_str.split(' ').collect();
 
         assert!(parts.len() == 2);
 
@@ -259,7 +259,8 @@ fn read_input<R>(reader: R) -> Program
 where
     R: BufRead,
 {
-    Program::from_lines(&reader.lines().map(|l| l.unwrap().to_string()).collect())
+    let lines: Vec<String> = reader.lines().map(|l| l.unwrap()).collect();
+    Program::from_lines(&lines)
 }
 
 fn get_terminating_accumulator_value_after_fix(program: &Program) -> Option<i32> {
