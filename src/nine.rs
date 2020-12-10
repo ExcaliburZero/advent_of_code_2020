@@ -7,7 +7,12 @@ pub fn part_one() {
     println!("{}", answer.unwrap())
 }
 
-pub fn part_two() {}
+pub fn part_two() {
+    let numbers = read_input(io::stdin().lock());
+    let answer = sum_min_max_contiguous_bad_num_summing_range(&numbers);
+
+    println!("{}", answer.unwrap())
+}
 
 fn read_input<R>(reader: R) -> Vec<i64>
 where
@@ -45,4 +50,24 @@ fn get_first_non_prev_sum_number(numbers: &Vec<i64>) -> Option<i64> {
     }
 
     None
+}
+
+fn sum_min_max_contiguous_bad_num_summing_range(numbers: &Vec<i64>) -> Option<i64> {
+    match get_first_non_prev_sum_number(numbers) {
+        None => None,
+        Some(bad_number) => {
+            for i in 0..numbers.len() {
+                for j in (i + 2)..numbers.len() {
+                    if numbers[i..j].iter().sum::<i64>() == bad_number {
+                        let min = numbers[i..j].iter().min().unwrap();
+                        let max = numbers[i..j].iter().max().unwrap();
+
+                        return Some(min + max);
+                    }
+                }
+            }
+
+            None
+        }
+    }
 }
