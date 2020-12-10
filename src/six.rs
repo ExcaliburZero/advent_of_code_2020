@@ -20,7 +20,7 @@ struct GroupAnswers {
 }
 
 impl GroupAnswers {
-    fn from_lines(lines: &Vec<String>) -> GroupAnswers {
+    fn from_lines(lines: &[String]) -> GroupAnswers {
         let mut member_answers: Vec<BTreeSet<char>> = vec![];
         for line in lines.iter() {
             let mut answers: BTreeSet<char> = BTreeSet::new();
@@ -47,7 +47,7 @@ impl GroupAnswers {
     }
 
     fn num_questions_all_anwered_yes(&self) -> i32 {
-        if self.member_answers.len() == 0 {
+        if self.member_answers.is_empty() {
             0
         } else {
             self.member_answers[0]
@@ -68,23 +68,23 @@ where
         .collect::<Vec<String>>()
         .join("\n")
         .split("\n\n")
-        .map(|lines| lines.split("\n").map(|l| l.to_string()).collect())
+        .map(|lines| lines.split('\n').map(|l| l.to_string()).collect())
         .collect();
 
     group_strings
         .iter()
-        .map(GroupAnswers::from_lines)
+        .map(|lines| GroupAnswers::from_lines(lines))
         .collect::<Vec<GroupAnswers>>()
 }
 
-fn sum_num_questions_any_anwered_yes(groups: &Vec<GroupAnswers>) -> i32 {
+fn sum_num_questions_any_anwered_yes(groups: &[GroupAnswers]) -> i32 {
     groups
         .iter()
         .map(GroupAnswers::num_questions_any_anwered_yes)
         .sum()
 }
 
-fn sum_num_questions_all_anwered_yes(groups: &Vec<GroupAnswers>) -> i32 {
+fn sum_num_questions_all_anwered_yes(groups: &[GroupAnswers]) -> i32 {
     groups
         .iter()
         .map(GroupAnswers::num_questions_all_anwered_yes)
