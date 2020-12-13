@@ -14,6 +14,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
+          components: clippy
           default: true
           override: true
 
@@ -22,3 +23,9 @@ jobs:
 
       - name: Test
         run: cargo +nightly test
+
+      - name: Static analysis
+        uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --all-features
