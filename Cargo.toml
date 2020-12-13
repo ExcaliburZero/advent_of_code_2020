@@ -7,3 +7,4 @@ authors = ["Christopher Wells <cwellsny@gmail.com>"]
 clap = "~2"
 clippy = ""
 regex = "1"
+itertools = "0.8"
