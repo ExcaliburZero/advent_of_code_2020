@@ -5,12 +5,17 @@ use std::io::{self, BufRead};
 
 pub fn part_one() {
     let commands = read_input(io::stdin().lock());
-    let answer = get_sum_mem_values_after_execution(&commands);
+    let answer = get_sum_mem_values_after_execution_v1(&commands);
 
     println!("{}", answer);
 }
 
-pub fn part_two() {}
+pub fn part_two() {
+    let commands = read_input(io::stdin().lock());
+    let answer = get_sum_mem_values_after_execution_v2(&commands);
+
+    println!("{}", answer);
+}
 
 fn read_input<R>(reader: R) -> Vec<Command>
 where
@@ -59,7 +64,7 @@ impl Mask {
         Ok(Mask { bits })
     }
 
-    fn apply_to(&self, value: u64) -> u64 {
+    fn apply_to_v1(&self, value: u64) -> u64 {
         let mut masked_value = value;
         for (i, bit) in self.bits.iter().rev().enumerate() {
             match bit {
@@ -76,6 +81,50 @@ impl Mask {
         }
 
         masked_value
+    }
+
+    fn apply_to_v2(&self, value: u64) -> Vec<u64> {
+        let indices_and_bits: Vec<(usize, &MaskBit)> = self.bits.iter().rev().enumerate().collect();
+
+        let one_bits: Vec<usize> = indices_and_bits
+            .iter()
+            .filter(|(_, b)| **b == MaskBit::One)
+            .map(|(i, _)| *i)
+            .collect();
+
+        let x_bits: Vec<usize> = indices_and_bits
+            .iter()
+            .filter(|(_, b)| **b == MaskBit::X)
+            .map(|(i, _)| *i)
+            .collect();
+
+        let mut masked_value = value;
+        for i in one_bits.iter() {
+            let bit_mask: u64 = 1 << i;
+            masked_value |= bit_mask;
+        }
+
+        let mut possibilities: Vec<u64> = vec![];
+        Mask::get_possible_values(masked_value, &x_bits, &mut possibilities);
+
+        possibilities
+    }
+
+    fn get_possible_values(value: u64, x_bit_indices: &[usize], possibilities: &mut Vec<u64>) {
+        if x_bit_indices.is_empty() {
+            possibilities.push(value);
+            return;
+        }
+
+        let i = x_bit_indices[0];
+
+        let zero_mask: u64 = !(1 << i);
+        let zero_value = value & zero_mask;
+        Mask::get_possible_values(zero_value, &x_bit_indices[1..], possibilities);
+
+        let one_mask: u64 = 1 << i;
+        let one_value = value | one_mask;
+        Mask::get_possible_values(one_value, &x_bit_indices[1..], possibilities);
     }
 }
 
@@ -122,13 +171,26 @@ impl State {
         }
     }
 
-    fn execute(&mut self, command: &Command) {
+    fn execute_v1(&mut self, command: &Command) {
         match command {
             Command::SetMask(mask) => self.mask = *mask,
             Command::SetValue(index, value) => {
-                let masked_value = self.mask.apply_to(*value);
+                let masked_value = self.mask.apply_to_v1(*value);
 
                 self.memory.insert(*index, masked_value);
+            }
+        }
+    }
+
+    fn execute_v2(&mut self, command: &Command) {
+        match command {
+            Command::SetMask(mask) => self.mask = *mask,
+            Command::SetValue(index, value) => {
+                let possibile_indices = self.mask.apply_to_v2(*index as u64);
+
+                for i in possibile_indices.iter() {
+                    self.memory.insert(*i as usize, *value);
+                }
             }
         }
     }
@@ -138,10 +200,19 @@ impl State {
     }
 }
 
-fn get_sum_mem_values_after_execution(commands: &[Command]) -> u64 {
+fn get_sum_mem_values_after_execution_v1(commands: &[Command]) -> u64 {
     let mut state = State::new_defaults();
     for comm in commands.iter() {
-        state.execute(comm);
+        state.execute_v1(comm);
+    }
+
+    state.sum_memory_values()
+}
+
+fn get_sum_mem_values_after_execution_v2(commands: &[Command]) -> u64 {
+    let mut state = State::new_defaults();
+    for comm in commands.iter() {
+        state.execute_v2(comm);
     }
 
     state.sum_memory_values()
@@ -211,14 +282,25 @@ mod tests {
     }
 
     #[test]
-    fn mask_apply_to() {
+    fn mask_apply_to_v1() {
         let mask = Mask::from_str("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX101").unwrap();
         let input: u64 = 0b1100;
 
         let expected: u64 = 0b1101;
-        let actual = mask.apply_to(input);
+        let actual = mask.apply_to_v1(input);
 
         //println!("actual: {:#036b}", actual);
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn mask_apply_to_v2() {
+        let mask = Mask::from_str("000000000000000000000000000000000X1X").unwrap();
+        let input: u64 = 0b1000;
+
+        let expected: Vec<u64> = vec![0b1010, 0b1110, 0b1011, 0b1111];
+        let actual = mask.apply_to_v2(input);
 
         assert_eq!(expected, actual);
     }
