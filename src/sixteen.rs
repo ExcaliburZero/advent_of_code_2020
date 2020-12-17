@@ -1,5 +1,6 @@
 extern crate regex;
 
+use std::collections::{BTreeMap, BTreeSet};
 use std::io::{self, BufRead};
 
 pub fn part_one() {
@@ -9,9 +10,14 @@ pub fn part_one() {
     println!("{}", answer);
 }
 
-pub fn part_two() {}
+pub fn part_two() {
+    let (fields, my_ticket, nearby_tickets) = read_input(io::stdin().lock());
+    let answer = get_product_of_my_departure_values(&fields, &my_ticket, &nearby_tickets);
 
-#[derive(Debug, PartialEq)]
+    println!("{}", answer);
+}
+
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 struct Field {
     name: String,
     range_1: NumberRange,
@@ -49,9 +55,17 @@ impl Field {
     fn valid_for(&self, num: u32) -> bool {
         self.range_1.contains(num) || self.range_2.contains(num)
     }
+
+    fn num_valid_for(&self, numbers: &BTreeSet<u32>) -> usize {
+        numbers
+            .iter()
+            .copied()
+            .filter(|n| self.range_1.contains(*n) || self.range_2.contains(*n))
+            .count()
+    }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 struct NumberRange {
     lower: u32,
     upper: u32,
@@ -116,11 +130,111 @@ where
     (fields, my_ticket, nearby_tickets)
 }
 
+fn find_field_allocation(
+    possible_fields: &BTreeMap<usize, Vec<Field>>,
+    remaining_indices: &[usize],
+    allocated_fields: &[Field],
+    allocations: &[(usize, Field)],
+) -> Option<Vec<(usize, Field)>> {
+    if remaining_indices.is_empty() {
+        Some(allocations.to_owned())
+    } else {
+        for i in remaining_indices.iter() {
+            for field in possible_fields.get(i).unwrap() {
+                if !allocated_fields.contains(field) {
+                    let mut new_remaining_indices = remaining_indices.to_owned();
+                    new_remaining_indices.retain(|x| x != i);
+
+                    let mut new_allocated_fields = allocated_fields.to_owned();
+                    new_allocated_fields.push(field.clone());
+
+                    let mut new_allocations = allocations.to_owned();
+                    new_allocations.push((*i, field.clone()));
+
+                    match find_field_allocation(
+                        possible_fields,
+                        &new_remaining_indices,
+                        &new_allocated_fields,
+                        &new_allocations,
+                    ) {
+                        None => (),
+                        Some(a) => return Some(a),
+                    }
+                }
+            }
+        }
+
+        None
+    }
+}
+
+fn find_fields_order(fields: &[Field], tickets: &[&Ticket]) -> Vec<Field> {
+    let columns_values: Vec<BTreeSet<u32>> = (0..fields.len())
+        .map(|i| tickets.iter().map(|t| t.values[i]).collect())
+        .collect();
+
+    let fields_possibilities: Vec<(usize, Vec<Field>)> = columns_values
+        .iter()
+        .map(|column_values| {
+            fields
+                .iter()
+                .filter(|field| field.num_valid_for(column_values) == column_values.len())
+                .cloned()
+                .collect()
+        })
+        .enumerate()
+        .collect();
+
+    let mut edges = BTreeMap::new();
+    for (i, fields) in fields_possibilities {
+        edges.insert(i, fields);
+    }
+
+    let mut indices: Vec<usize> = edges.keys().cloned().collect();
+    indices.sort_by(|a, b| {
+        edges
+            .get(a)
+            .unwrap()
+            .len()
+            .cmp(&edges.get(b).unwrap().len())
+    });
+
+    let mut fields_with_indexes = find_field_allocation(&edges, &indices, &[], &[]).unwrap();
+
+    fields_with_indexes.sort_by(|a, b| a.0.cmp(&b.0));
+
+    fields_with_indexes
+        .iter()
+        .map(|(_, field)| field)
+        .cloned()
+        .collect()
+}
+
 fn get_sum_invalid_numbers(fields: &[Field], nearby_tickets: &[Ticket]) -> u32 {
     nearby_tickets
         .iter()
         .flat_map(|t| t.get_invalid_numbers(fields))
         .sum()
+}
+
+fn get_product_of_my_departure_values(
+    fields: &[Field],
+    my_ticket: &Ticket,
+    nearby_tickets: &[Ticket],
+) -> u64 {
+    let valid_nearby_tickets: Vec<&Ticket> = nearby_tickets
+        .iter()
+        .filter(|ticket| ticket.get_invalid_numbers(fields).is_empty())
+        .collect();
+
+    let fields_in_order = find_fields_order(fields, &valid_nearby_tickets);
+
+    fields_in_order
+        .iter()
+        .enumerate()
+        .filter(|(_, field)| field.name.starts_with("departure"))
+        .map(|(i, _)| my_ticket.values[i] as u64)
+        .product()
 }
 
 #[cfg(test)]
